@@ -419,6 +419,8 @@ while True:
                 response = var.savePenguji(name)
                 if response.status_code == 200:
                     sg.Popup(response.text.replace('"', ""))
+                    penguji = var.getPenguji()
+                    window['Nama_penguji'].update(values=[name[0] for name in penguji])
                 else:
                     sg.Popup(response.text.replace('"', ""))
                 break
@@ -448,8 +450,11 @@ while True:
                 response = var.saveTransformator(name)
                 if response.status_code == 200:
                     sg.Popup(response.text.replace('"', ""))
+                    transformator = var.getTransformator()
+                    window['Nama_transformator'].update(values=[name[0] for name in transformator])
                 else:
                     sg.Popup(response.text.replace('"', ""))
+                break;
 
             if popupEvent == "Batal" or popupEvent == sg.WIN_CLOSED:
                 break
