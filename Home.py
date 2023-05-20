@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
 
 import PySimpleGUI as sg
-import math
-import numpy as np
-import io
 import requests
-import json
+import var
 
 # from Perhitungan import create_perhitungan
 # from History import create_history
@@ -22,10 +19,8 @@ font3 = ("Arial", 16, "bold")
 sg.SetOptions(element_padding=((1, 1), 0))
 
 # mengambil data penguji
-data = requests.get("http://localhost:8000/api/penguji").json()
-penguji = [(item["name"], item["id"]) for item in data]
-data = requests.get("http://localhost:8000/api/transformator").json()
-transformator = [(item["name"], item["id"]) for item in data]
+penguji = var.getPenguji()
+transformator = var.getTransformator()
 
 # Layout 1 untuk identitas
 layout1 = [
@@ -116,7 +111,13 @@ layout2_DPM = [
     [sg.Text("")],
     [
         sg.Text("Gas", size=(5, 1), justification="l", font=font1),
-        sg.Text("Concentration (ppm)", size=(20, 1), justification="c", font=font1, key="gas"),
+        sg.Text(
+            "Concentration (ppm)",
+            size=(20, 1),
+            justification="c",
+            font=font1,
+            key="gas",
+        ),
         #  sg.Text('Rate (ppm/year)',size=(15,1), justification='l', font=font1)
     ],
     [sg.Text("")],
@@ -176,7 +177,10 @@ layout2_DPM = [
     ],
     [sg.Text("  ")],
     # Buttom Analisis
-    [sg.Text("             "), sg.Button("Analisis", size=(15, 1), font=font1, key="AnalisisDPM")],
+    [
+        sg.Text("             "),
+        sg.Button("Analisis", size=(15, 1), font=font1, key="AnalisisDPM"),
+    ],
     [sg.Text("")],
 ]
 
@@ -232,7 +236,10 @@ layout2_DTM = [  # Judul Input Data Kandungan Konsentrasi Gas
     [sg.Text("     ")],
     [sg.Text("     ")],
     # Buttom Analisis
-    [sg.Text("             "), sg.Button("Analisis", size=(15, 1), font=font1, key="AnalisisDTM")],
+    [
+        sg.Text("             "),
+        sg.Button("Analisis", size=(15, 1), font=font1, key="AnalisisDTM"),
+    ],
     [sg.Text("")],
 ]
 # layout showing DGA Status based on the standard
@@ -360,21 +367,6 @@ layout = [
     LayoutButton,
 ]
 
-# Membuat Tampilan Popup Input Nama Penguji dan Nama Transformator
-Layout_Popup_Penguji = [
-    [sg.Text("Masukkan nama penguji:")],
-    [sg.Input(key="Nama_penguji")],
-    [sg.Text(" ")],
-    [sg.Button("OK"), sg.Button("Batal")],
-]
-Layout_Popup_Transformator = [
-    [sg.Text("Masukkan nama transformator:")],
-    [sg.Input(key="Nama_transformator")],
-    [sg.Text(" ")],
-    [sg.Button("OK"), sg.Button("Batal")],
-]
-
-
 # showing the window
 window = sg.Window("Identifikasi Kegagalan Transformator", layout)
 while True:
@@ -396,36 +388,42 @@ while True:
     #       current_layout = 'History'
 
     if event == "Metode":
-        window['hasil'].update(visible=False)
+        window["hasil"].update(visible=False)
         metode = values["Metode"]
         if metode == "DTM":
             window["layout2DPM"].update(visible=False)
-            window['layout2DTM'].update(visible=True)
+            window["layout2DTM"].update(visible=True)
         elif metode == "DPM":
             window["layout2DPM"].update(visible=True)
-            window['layout2DTM'].update(visible=False)
-        window['hasil'].update(visible=True)
+            window["layout2DTM"].update(visible=False)
+        window["hasil"].update(visible=True)
         window.refresh()
 
     # Bagian Popup (Untuk input nama penguji)
     if event == "+ Penguji":
         # Membuat objek window dari layout popup
+        Layout_Popup_Penguji = [
+            [sg.Text("Masukkan nama penguji:")],
+            [sg.Input(key="Nama_penguji")],
+            [sg.Text(" ")],
+            [sg.Button("OK"), sg.Button("Batal")],
+        ]
         popup = sg.Window("Input Nama Penguji").Layout(Layout_Popup_Penguji)
 
         # Looping event handler window popup
         while True:
-            event, values = popup.Read()
+            popupEvent, popupValues = popup.Read()
 
-            if event == "OK":
-                Nama_penguji = values["Nama_penguji"]
-                # sg.Popup(f'Nama Penguji: {Nama_penguji}')
-                data = {"name": Nama_penguji}
-                response = requests.post("http://localhost:8000/api/penguji", json=data)
+            if popupEvent == "OK":
+                name = popupValues["Nama_penguji"]
+                response = var.savePenguji(name)
                 if response.status_code == 200:
-                    sg.Popup(response.text)
+                    sg.Popup(response.text.replace('"', ""))
+                else:
+                    sg.Popup(response.text.replace('"', ""))
                 break
 
-            if event == "Batal" or event == sg.WIN_CLOSED:
+            if popupEvent == "Batal" or popupEvent == sg.WIN_CLOSED:
                 break
 
         popup.Close()
@@ -433,24 +431,27 @@ while True:
     # Bagian Popup (Untuk input nama transformator)
     if event == "+ Trafo":
         # Membuat objek window dari layout popup
+        Layout_Popup_Transformator = [
+            [sg.Text("Masukkan nama transformator:")],
+            [sg.Input(key="Nama_transformator")],
+            [sg.Text(" ")],
+            [sg.Button("OK"), sg.Button("Batal")],
+        ]
         popup = sg.Window("Input Nama Transformator").Layout(Layout_Popup_Transformator)
 
         # Looping event handler window popup
         while True:
-            event, values = popup.Read()
+            popupEvent, popupValues = popup.Read()
 
-            if event == "OK":
-                Nama_transformator = values["Nama_transformator"]
-                # sg.Popup(f'Nama Transformator: {Nama_transformator}')
-                data = {"name": Nama_transformator}
-                response = requests.post(
-                    "http://localhost:8000/api/transformator", json=data
-                )
+            if popupEvent == "OK":
+                name = popupValues["Nama_transformator"]
+                response = var.saveTransformator(name)
                 if response.status_code == 200:
-                    sg.Popup(response.text)
-                break
+                    sg.Popup(response.text.replace('"', ""))
+                else:
+                    sg.Popup(response.text.replace('"', ""))
 
-            if event == "Batal" or event == sg.WIN_CLOSED:
+            if popupEvent == "Batal" or popupEvent == sg.WIN_CLOSED:
                 break
 
         popup.Close()
@@ -459,52 +460,51 @@ while True:
     if event == "AnalisisDTM" or event == "AnalisisDPM":
         # Input_DTM = values["Input_DTM"]
         # Mendapatkan Id nama penguji
-        namapenguji = values['Nama_penguji']
+        namapenguji = values["Nama_penguji"]
         for item in penguji:
             if namapenguji == item[0]:
                 idpenguji = item[1]
 
         # Mendapatkan Id nama transformator
-        namatransformator = values['Nama_transformator']
+        namatransformator = values["Nama_transformator"]
         for item in transformator:
             if namatransformator == item[0]:
                 idtransformator = item[1]
-        
-        if event == 'AnalisisDTM':
-            ch4 = values['dtm-CH4']
-            c2h2 = values['dtm-C2H2']
-            c2h4 = values['dtm-C2H4']
+
+        if event == "AnalisisDTM":
+            ch4 = values["dtm-CH4"]
+            c2h2 = values["dtm-C2H2"]
+            c2h4 = values["dtm-C2H4"]
             data = {
-                "penguji_id": idpenguji, 
+                "penguji_id": idpenguji,
                 "transformator_id": idtransformator,
                 "CH4": ch4,
                 "C2H2": c2h2,
-                "C2H4": c2h4
-                }
-            response = requests.post("http://localhost:8000/api/input-dtm", json=data)
+                "C2H4": c2h4,
+            }
+            response = requests.post(var.url + "/input-dtm", json=data)
             if response.status_code == 200:
                 sg.Popup(response.text)
 
-        if event == 'AnalisisDPM':
-            h2 = values['dpm-H2']
-            ch4 = values['dpm-CH4']
-            c2h2 = values['dpm-C2H2']
-            c2h4 = values['dpm-C2H4']
-            c2h6 = values['dpm-C2H6']
+        if event == "AnalisisDPM":
+            h2 = values["dpm-H2"]
+            ch4 = values["dpm-CH4"]
+            c2h2 = values["dpm-C2H2"]
+            c2h4 = values["dpm-C2H4"]
+            c2h6 = values["dpm-C2H6"]
             data = {
-                "penguji_id": idpenguji, 
+                "penguji_id": idpenguji,
                 "transformator_id": idtransformator,
                 "H2": h2,
                 "CH4": ch4,
                 "C2H2": c2h2,
                 "C2H4": c2h4,
-                "C2H6": c2h6
-                }
-            response = requests.post("http://localhost:8000/api/input-dpm", json=data)
+                "C2H6": c2h6,
+            }
+            response = requests.post(var.url + "/input-dpm", json=data)
             if response.status_code == 200:
                 sg.Popup(response.text)
         # data = {"penguji_id": Input_DTM}, {"transformator_id": Input_DTM}, {"CH4": Input_DTM}
-
 
 
 window.close()
