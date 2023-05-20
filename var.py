@@ -19,3 +19,31 @@ def savePenguji(name):
 
 def saveTransformator(name):
     return rq.post(url + "/transformator", json={"name": name})
+
+
+def saveInputDTM(idpenguji, idtransformator, ch4, c2h2, c2h4):
+    return rq.post(
+        url + "/input-dtm",
+        json={
+            "penguji_id": idpenguji,
+            "transformator_id": idtransformator,
+            "CH4": ch4,
+            "C2H2": c2h2,
+            "C2H4": c2h4,
+        },
+    )
+
+
+def saveInputDPM(idpenguji, idtransformator, h2, ch4, c2h2, c2h4, c2h6):
+    return rq.post(
+        url + "/input-dpm",
+        json={
+            "penguji_id": idpenguji,
+            "transformator_id": idtransformator,
+            "h2": h2,
+            "CH4": ch4,
+            "C2H2": c2h2,
+            "C2H4": c2h4,
+            "C2H6": c2h6,
+        },
+    )
