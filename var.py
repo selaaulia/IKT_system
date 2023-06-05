@@ -47,3 +47,12 @@ def saveInputDPM(idpenguji, idtransformator, h2, ch4, c2h2, c2h4, c2h6):
             "C2H6": c2h6,
         },
     )
+
+def saveResultDTM(idinputdtm, fault):
+    return rq.post(
+        url + "/result-dtm",
+        json={
+            "dtm_input_id": idinputdtm,
+            "fault": fault,
+        },
+    )

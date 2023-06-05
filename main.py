@@ -3,9 +3,14 @@
 import PySimpleGUI as sg
 import var
 import history
+import numpy as np
+import joblib
+import os
 
 # from Perhitungan import create_perhitungan
 # from History import create_history
+
+dirname = os.path.dirname(__file__)
 
 
 def showHome():
@@ -277,7 +282,7 @@ def showHome():
             sg.Text(
                 "",
                 size=(20, 2),
-                key="result",
+                key="rnama_penguji",
                 background_color="lightgrey",
                 text_color="black",
                 justification="c",
@@ -291,7 +296,7 @@ def showHome():
             sg.Text(
                 "",
                 size=(8, 2),
-                key="result",
+                key="rnama_transformator",
                 background_color="lightgrey",
                 text_color="black",
                 justification="c",
@@ -302,7 +307,7 @@ def showHome():
             sg.Text(
                 "",
                 size=(8, 2),
-                key="result",
+                key="result_fault",
                 background_color="lightgrey",
                 text_color="black",
                 justification="c",
@@ -490,6 +495,17 @@ def showHome():
                 ch4 = values["dtm-CH4"]
                 c2h2 = values["dtm-C2H2"]
                 c2h4 = values["dtm-C2H4"]
+
+                # prediksi
+                dtm_model = joblib.load(os.path.join(dirname, "models/dtm.pckl"))
+                dtm_prediction = dtm_model.predict(np.array([[ch4, c2h2, c2h4]]))
+
+                # Menampilkan hasil analsis
+                window["rnama_penguji"].update(namapenguji)
+                window["rnama_transformator"].update(namatransformator)
+                window["result_fault"].update(dtm_prediction[0])
+
+                # simpan data ke database
                 response = var.saveInputDTM(idpenguji, idtransformator, ch4, c2h2, c2h4)
                 if response.status_code == 200:
                     sg.Popup(response.text.replace('"', ""))
@@ -502,6 +518,20 @@ def showHome():
                 c2h2 = values["dpm-C2H2"]
                 c2h4 = values["dpm-C2H4"]
                 c2h6 = values["dpm-C2H6"]
+
+                # Menghitung titik Cx dan Cy
+                Cx, Cy = calculate_cx_cy(h2, ch4, c2h2, c2h4, c2h6)
+
+                # Prediksi
+                dpm_model = joblib.load(os.path.join(dirname, "models/dpm.pckl"))
+                dpm_prediction = dpm_model.predict(np.array([[Cx, Cy]]))
+
+                # Menampilkan hasil analisis
+                window["rnama_penguji"].update(namapenguji)
+                window["rnama_transformator"].update(namatransformator)
+                window["result_fault"].update(dpm_prediction[0])
+
+                # simpan data ke database
                 response = var.saveInputDPM(
                     idpenguji, idtransformator, h2, ch4, c2h2, c2h4, c2h6
                 )
@@ -509,12 +539,13 @@ def showHome():
                     sg.Popup(response.text.replace('"', ""))
                 else:
                     sg.Popup(response.text.replace('"', ""))
-        
-        if event == 'History':
+
+        if event == "History":
             window.hide()
             if history.showHistory():
                 window.un_hide()
 
     window.close()
-    
+
+
 showHome()
