@@ -40,7 +40,7 @@ def saveInputDPM(idpenguji, idtransformator, h2, ch4, c2h2, c2h4, c2h6):
         json={
             "penguji_id": idpenguji,
             "transformator_id": idtransformator,
-            "h2": h2,
+            "H2": h2,
             "CH4": ch4,
             "C2H2": c2h2,
             "C2H4": c2h4,
