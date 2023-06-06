@@ -522,14 +522,35 @@ def showHome():
                     sg.Popup(response.text.replace('"', ""))
 
             elif event == "AnalisisDPM":
-                h2 = values["dpm-H2"]
-                ch4 = values["dpm-CH4"]
-                c2h2 = values["dpm-C2H2"]
-                c2h4 = values["dpm-C2H4"]
-                c2h6 = values["dpm-C2H6"]
+                h2 = float(values["dpm-H2"])
+                ch4 = float(values["dpm-CH4"])
+                c2h2 = float(values["dpm-C2H2"])
+                c2h4 = float(values["dpm-C2H4"])
+                c2h6 = float(values["dpm-C2H6"])
 
-                # Menghitung titik Cx dan Cy
-                Cx, Cy = calculate_cx_cy(h2, ch4, c2h2, c2h4, c2h6)
+                # Menghitung titik Cx dan Cy yang terdiri dari beberapa tahap
+                # Menghitung presentase relatif gas
+                prH2 = h2 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
+                prCH4 = ch4 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
+                prC2H2 = c2h2 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
+                prC2H4 = c2h4 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
+                prC2H6 = c2h6 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100 
+                # Menghitung titik x, y 
+                xH2 = prH2 / 100 * 0
+                yH2 = prH2 / 100 * 100
+                xCH4 = prCH4 / 100 * -58.8
+                yCH4 = prCH4 / 100 * -80.9
+                xC2H2 = prC2H2 / 100 * 95.1
+                yC2H2 = prC2H2 / 100 * 30.9
+                xC2H4 = prC2H4 / 100 * 58.8
+                yC2H4 = prC2H4 / 100 * -80.9
+                xC2H6 = prC2H6 / 100 * -95.1
+                yC2H6 = prC2H6 / 100 * 30.9
+                # Menghitung permukaan poligon
+                A = 1 / 2 * ((xH2*yC2H6 - xC2H6*yH2) + (xC2H6 * yCH4 - xCH4 * yC2H6) + (xCH4 * yC2H4 - xC2H4 * yCH4) + (xC2H4 * yC2H2 - xC2H2 * yC2H4))               
+                # Menghitung Cx dan Cy
+                Cx = 1 / (6 * A)*((xH2 + xC2H6) * (xH2 * yC2H6 - xC2H6 * yH2) + (xC2H6 + xCH4) * (xC2H6 * yCH4 - xCH4 * yC2H6) + (xCH4 + xC2H4) * (xCH4 * yC2H4 - xC2H4 * yCH4) + (xC2H4 + xC2H2) * (xC2H4 * yC2H2 - xC2H2 * yC2H4))
+                Cy = 1 / (6 * A)*((yH2 + yC2H6) * (xH2 * yC2H6 - xC2H6 * yH2) + (yC2H6 + yCH4) * (xC2H6 * yCH4 - xCH4 * yC2H6) + (yCH4 + yC2H4) * (xCH4 * yC2H4 - xC2H4 * yCH4) + (yC2H4 + yC2H2) * (xC2H4 * yC2H2 - xC2H2 * yC2H4))
 
                 # Prediksi
                 dpm_model = joblib.load(os.path.join(dirname, "models/dpm.pckl"))
