@@ -3,7 +3,7 @@
 import PySimpleGUI as sg
 import var
 
-def showHistory():
+def showHistory(transformator):
     # create theme
     sg.theme("DarkTeal11")
 
@@ -21,7 +21,7 @@ def showHistory():
         [
             sg.Button("Pilih Data", size=(17, 1), font=font1),
             sg.Combo(
-                [name[0] for name in var.getTransformator()],
+                [name[0] for name in transformator],
                 size=(15, 1),
                 key="sample",
             ),
