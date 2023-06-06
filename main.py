@@ -322,7 +322,7 @@ def showHome():
             sg.Text(
                 "",
                 size=(30, 5),
-                key="result",
+                key="result_description",
                 background_color="lightgrey",
                 text_color="black",
                 justification="c",
@@ -357,7 +357,6 @@ def showHome():
             sg.Text("                                              "),
             sg.Text("                                              "),
             sg.Text(" "),
-            sg.Button("Perhitungan", size=(10, 1), font=font1),
             sg.Button("History", size=(10, 1), font=font1),
         ],
     ]
@@ -500,15 +499,25 @@ def showHome():
                 dtm_model = joblib.load(os.path.join(dirname, "models/dtm.pckl"))
                 dtm_prediction = dtm_model.predict(np.array([[ch4, c2h2, c2h4]]))
 
-                # Menampilkan hasil analsis
-                window["rnama_penguji"].update(namapenguji)
-                window["rnama_transformator"].update(namatransformator)
-                window["result_fault"].update(dtm_prediction[0])
-
                 # simpan data ke database
                 response = var.saveInputDTM(idpenguji, idtransformator, ch4, c2h2, c2h4)
+                jsonInput = response.json()
                 if response.status_code == 200:
-                    sg.Popup(response.text.replace('"', ""))
+                    # Menyimpan hasil analisis
+                    responseResult = var.saveResultDTM(jsonInput['id'], dtm_prediction[0])
+                    jsonResult = responseResult.json()
+
+                    # Menampilkan hasil analsis
+                    window["rnama_penguji"].update(namapenguji)
+                    window["rnama_transformator"].update(namatransformator)
+                    window["result_fault"].update(dtm_prediction[0])
+                    window["result_description"].update(jsonResult['description'])
+
+                    if responseResult.status_code == 200:
+                        sg.Popup(jsonResult['message'])
+                    else:
+                        sg.Popup(response.text.replace('"', ""))
+
                 else:
                     sg.Popup(response.text.replace('"', ""))
 

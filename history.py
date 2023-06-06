@@ -36,8 +36,7 @@ def showHistory(transformator):
             sg.Text(" "),
             sg.Text(" "),
             # Button Halaman
-            sg.Button("Perhitungan", size=(10, 1), font=font1),
-            sg.Button("History", size=(10, 1), font=font1),
+            sg.Button("Perhitungan", size=(10, 1), font=font1, key="btnPerhitungan"),
         ],
         # Penamaan Halaman
         [sg.Text(" ")],
@@ -228,6 +227,9 @@ def showHistory(transformator):
             window["rC2H4"].update("")
             window["cC2H6"].update("")
             window["rC2H6"].update("")
+        
+        if event == "btnPerhitungan":
+            window.close()
 
     #     #DPM
     #     #DPM PERCENTAGE
