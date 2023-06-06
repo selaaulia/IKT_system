@@ -542,7 +542,7 @@ def showHome():
 
         if event == "History":
             window.hide()
-            if history.showHistory():
+            if history.showHistory(transformator):
                 window.un_hide()
 
     window.close()
