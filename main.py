@@ -560,13 +560,14 @@ def showHome():
                 window["rnama_penguji"].update(namapenguji)
                 window["rnama_transformator"].update(namatransformator)
                 window["result_fault"].update(dpm_prediction[0])
+                window["result_description"].update(jsonResult['description'])
 
                 # simpan data ke database
                 response = var.saveInputDPM(
                     idpenguji, idtransformator, h2, ch4, c2h2, c2h4, c2h6
                 )
                 if response.status_code == 200:
-                    sg.Popup(response.text.replace('"', ""))
+                    sg.Popup(jsonResult['message'])
                 else:
                     sg.Popup(response.text.replace('"', ""))
 
