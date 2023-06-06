@@ -560,7 +560,7 @@ def showHome():
                 window["rnama_penguji"].update(namapenguji)
                 window["rnama_transformator"].update(namatransformator)
                 window["result_fault"].update(dpm_prediction[0])
-                window["result_description"].update(jsonResult['description'])
+                window["result_description"].update(jsonResult['description_dpm'])
 
                 # simpan data ke database
                 response = var.saveInputDPM(
