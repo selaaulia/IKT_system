@@ -549,25 +549,33 @@ def showHome():
                 # Menghitung permukaan poligon
                 A = 1 / 2 * ((xH2*yC2H6 - xC2H6*yH2) + (xC2H6 * yCH4 - xCH4 * yC2H6) + (xCH4 * yC2H4 - xC2H4 * yCH4) + (xC2H4 * yC2H2 - xC2H2 * yC2H4))               
                 # Menghitung Cx dan Cy
-                Cx = 1 / (6 * A)*((xH2 + xC2H6) * (xH2 * yC2H6 - xC2H6 * yH2) + (xC2H6 + xCH4) * (xC2H6 * yCH4 - xCH4 * yC2H6) + (xCH4 + xC2H4) * (xCH4 * yC2H4 - xC2H4 * yCH4) + (xC2H4 + xC2H2) * (xC2H4 * yC2H2 - xC2H2 * yC2H4))
-                Cy = 1 / (6 * A)*((yH2 + yC2H6) * (xH2 * yC2H6 - xC2H6 * yH2) + (yC2H6 + yCH4) * (xC2H6 * yCH4 - xCH4 * yC2H6) + (yCH4 + yC2H4) * (xCH4 * yC2H4 - xC2H4 * yCH4) + (yC2H4 + yC2H2) * (xC2H4 * yC2H2 - xC2H2 * yC2H4))
+                cx = 1 / (6 * A)*((xH2 + xC2H6) * (xH2 * yC2H6 - xC2H6 * yH2) + (xC2H6 + xCH4) * (xC2H6 * yCH4 - xCH4 * yC2H6) + (xCH4 + xC2H4) * (xCH4 * yC2H4 - xC2H4 * yCH4) + (xC2H4 + xC2H2) * (xC2H4 * yC2H2 - xC2H2 * yC2H4))
+                cy = 1 / (6 * A)*((yH2 + yC2H6) * (xH2 * yC2H6 - xC2H6 * yH2) + (yC2H6 + yCH4) * (xC2H6 * yCH4 - xCH4 * yC2H6) + (yCH4 + yC2H4) * (xCH4 * yC2H4 - xC2H4 * yCH4) + (yC2H4 + yC2H2) * (xC2H4 * yC2H2 - xC2H2 * yC2H4))
 
                 # Prediksi
                 dpm_model = joblib.load(os.path.join(dirname, "models/dpm.pckl"))
-                dpm_prediction = dpm_model.predict(np.array([[Cx, Cy]]))
-
-                # Menampilkan hasil analisis
-                window["rnama_penguji"].update(namapenguji)
-                window["rnama_transformator"].update(namatransformator)
-                window["result_fault"].update(dpm_prediction[0])
-                window["result_description"].update(jsonResult['description_dpm'])
+                dpm_prediction = dpm_model.predict(np.array([[cx, cy]]))
+                # print(dpm_prediction)
 
                 # simpan data ke database
-                response = var.saveInputDPM(
-                    idpenguji, idtransformator, h2, ch4, c2h2, c2h4, c2h6
-                )
+                response = var.saveInputDPM(idpenguji, idtransformator, h2, ch4, c2h2, c2h4, c2h6)
+                jsonInputDPM = response.json()
                 if response.status_code == 200:
-                    sg.Popup(jsonResult['message'])
+                    # Menyimpan hasil analisis
+                    responseResultDPM = var.saveResultDPM(jsonInputDPM['id'], cx, cy, dpm_prediction[0])
+                    jsonResultDPM = responseResultDPM.json()
+
+                    # Menampilkan hasil analisis
+                    window["rnama_penguji"].update(namapenguji)
+                    window["rnama_transformator"].update(namatransformator)
+                    window["result_fault"].update(dpm_prediction[0])
+                    # window["result_description"].update(jsonResultDPM['description_dpm'])
+
+                    if responseResultDPM.status_code == 200:
+                        sg.Popup(jsonResultDPM['message'])
+                    else:
+                        sg.Popup(response.text.replace('"', ""))
+                    
                 else:
                     sg.Popup(response.text.replace('"', ""))
 

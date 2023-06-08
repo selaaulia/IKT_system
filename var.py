@@ -57,11 +57,13 @@ def saveResultDTM(idinputdtm, fault):
         },
     )
 
-def saveResultDPM(idinputdpm, fault):
+def saveResultDPM(idinputdpm, cx, cy, fault):
     return rq.post(
         url + "/result-dpm",
         json={
             "dpm_input_id": idinputdpm,
+            "cx": cx,
+            "cy": cy,
             "fault": fault,
         },
     )
