@@ -569,7 +569,7 @@ def showHome():
                     window["rnama_penguji"].update(namapenguji)
                     window["rnama_transformator"].update(namatransformator)
                     window["result_fault"].update(dpm_prediction[0])
-                    # window["result_description"].update(jsonResultDPM['description_dpm'])
+                    window["result_description"].update(jsonResultDPM['description_dpm'])
 
                     if responseResultDPM.status_code == 200:
                         sg.Popup(jsonResultDPM['message'])
