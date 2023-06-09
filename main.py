@@ -60,7 +60,7 @@ def showHome():
         [sg.Text("     ")],
         # Input nama transformator
         [
-            sg.Text("Nama Transformator", size=(12, 2), justification="c", font=font2),
+            sg.Text("Nama Trafo", size=(12, 1), justification="c", font=font2),
             sg.Combo(
                 [name[0] for name in transformator],
                 key="Nama_transformator",
@@ -81,19 +81,9 @@ def showHome():
         [sg.Text("     ")],
         [sg.Text("     ")],
         [sg.Text("     ")],
-        #   Button Input (Digunakan untuk menmapilkan popup input nama transformator dan nama penguji baru)
-        # [sg.Text('')],
-        # [sg.Text('  '),
-        #  sg.Text('  '),
-        #  sg.Text('  '),
-        #  sg.Text('  '),
-        #  sg.Text('  '),
-        #  sg.Text('  '),
-        #  sg.Text('  '),
-        #  sg.Text('  '),
-        #  sg.Button('Input', size=(15,1), font=font1)],
-        #  [sg.Text('')],
-        # Keterangan
+        [sg.Text("     ")],
+        [sg.Text("     ")],
+        #Keterangan
         [
             sg.Text(
                 "Keterangan: \nButton +Penguji / +trafo digunakan untuk menambah nama penguji dan nama transformator yang belum terdapat pada list dropdown",
@@ -189,7 +179,9 @@ def showHome():
             #  sg.Text(''),
             #  sg.InputText('', key='rC2H6', size=(14,1), justification='c')
         ],
-        [sg.Text("  ")],
+        [sg.Text("     ")],
+        [sg.Text("     ")],
+        [sg.Text("     ")],
         # Buttom Analisis
         [
             sg.Text("             "),
@@ -256,6 +248,8 @@ def showHome():
         [sg.Text("     ")],
         [sg.Text("     ")],
         [sg.Text("     ")],
+        [sg.Text("     ")],
+        [sg.Text("     ")],
         # Buttom Analisis
         [
             sg.Text("             "),
@@ -288,6 +282,20 @@ def showHome():
                 justification="c",
             ),
         ],
+        # Nama Transformator
+        [sg.Text("  ")],
+        [
+            sg.Text("Nama Trafo", size=(8, 2), justification="1", font=font2),
+            sg.Text("  "),
+            sg.Text(
+                "",
+                size=(20, 2),
+                key="rnama_transformator",
+                background_color="lightgrey",
+                text_color="black",
+                justification="c",
+            ),
+        ],
         # Metode & Titik Kerusakan
         [sg.Text("  ")],
         [
@@ -296,7 +304,7 @@ def showHome():
             sg.Text(
                 "",
                 size=(8, 2),
-                key="rnama_transformator",
+                key="rmetode",
                 background_color="lightgrey",
                 text_color="black",
                 justification="c",
@@ -321,7 +329,7 @@ def showHome():
             sg.Text("  "),
             sg.Text(
                 "",
-                size=(30, 5),
+                size=(30, 4),
                 key="result_description",
                 background_color="lightgrey",
                 text_color="black",
@@ -512,6 +520,7 @@ def showHome():
                     # Menampilkan hasil analsis
                     window["rnama_penguji"].update(namapenguji)
                     window["rnama_transformator"].update(namatransformator)
+                    window["rmetode"].update(metode)
                     window["result_fault"].update(dtm_prediction[0])
                     window["result_description"].update(jsonResult["description"])
 
@@ -581,8 +590,8 @@ def showHome():
                     )
                 )
 
-                Hasil_cx = "hasil cx =" + str(cx)
-                Hasil_cy = "hasil cy =" + str(cy)
+                Hasil_cx = "Hasil Cx =" + str(cx)
+                Hasil_cy = "Hasil Cy =" + str(cy)
 
                 # Prediksi
                 dpm_model = joblib.load(os.path.join(dirname, "models/dpm.pckl"))
@@ -604,12 +613,13 @@ def showHome():
                     # Menampilkan hasil analisis
                     window["rnama_penguji"].update(namapenguji)
                     window["rnama_transformator"].update(namatransformator)
+                    window["rmetode"].update(metode)
                     window["result_fault"].update(dpm_prediction[0])
                     window["result_description"].update(
                         jsonResultDPM["description_dpm"]
-                        + " "
+                        + "\n"
                         + Hasil_cx
-                        + " "
+                        + "\n"
                         + Hasil_cy
                     )
 
@@ -630,3 +640,4 @@ def showHome():
 
 
 showHome()
+

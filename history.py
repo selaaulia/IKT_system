@@ -44,7 +44,7 @@ def showHistory(transformator):
         [sg.Text(" ")],
         [
             sg.Text("      "),
-            sg.Text("Halaman History", size=(70, 1), justification="c", font=font3),
+            sg.Text("Halaman History", size=(60, 1), justification="c", font=font3),
         ],
     ]
 
@@ -85,7 +85,7 @@ def showHistory(transformator):
             sg.Text("  "),
             sg.Text(
                 "Identifikasi Kegagalan Transformator Dengan DTM DPM",
-                size=(70, 1),
+                size=(60, 1),
                 justification="c",
                 font=font3,
             ),
