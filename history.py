@@ -3,6 +3,7 @@
 import PySimpleGUI as sg
 import var
 
+
 def showHistory(transformator):
     # create theme
     sg.theme("DarkTeal11")
@@ -23,7 +24,8 @@ def showHistory(transformator):
             sg.Combo(
                 [name[0] for name in transformator],
                 size=(15, 1),
-                key="sample",
+                key="transformator",
+                enable_events=True,
             ),
             sg.Button("Hapus Data", size=(12, 1), font=font1),
             sg.Text(" "),
@@ -55,79 +57,11 @@ def showHistory(transformator):
         ],
     ]
 
-    # Data untuk tabel
-    data = [
-        [
-            "Tansformator 1",
-            "24-03-2022",
-            "DPM",
-            "7",
-            "5",
-            "9",
-            "12",
-            "24",
-            "D1",
-            "Titik X= 0.98765 dan Y=0.23456",
-            "Sela Aulia",
-        ],
-        [
-            "Tansformator 1",
-            "23-03-2022",
-            "DTM",
-            " ",
-            "5",
-            "9",
-            "12",
-            " ",
-            "D1",
-            "Titik X= 0.98765 dan Y=0.23456",
-            "Sela Aulia",
-        ],
-        [
-            "Tansformator 1",
-            "22-03-2022",
-            "DPM",
-            "7",
-            "5",
-            "9",
-            "12",
-            "24",
-            "D1",
-            "Titik X= 0.98765 dan Y=0.23456",
-            "Sela Aulia",
-        ],
-        [
-            "Tansformator 1",
-            "21-03-2022",
-            "DTM",
-            " ",
-            "5",
-            "9",
-            "12",
-            " ",
-            "D1",
-            "Titik X= 0.98765 dan Y=0.23456",
-            "Sela Aulia",
-        ],
-        [
-            "Tansformator 1",
-            "20-03-2022",
-            "DPM",
-            "7",
-            "5",
-            "9",
-            "12",
-            "24",
-            "D1",
-            "Titik X= 0.98765 dan Y=0.23456",
-            "Sela Aulia",
-        ],
-    ]
     # Layout tabel
     table_layout = [
         [
             sg.Table(
-                values=data,
+                values=[],
                 headings=[
                     "Transformator",
                     "Tanggal",
@@ -144,6 +78,7 @@ def showHistory(transformator):
                 num_rows=5,
                 col_widths=[15, 5, 20],
                 justification="c",
+                key="data",
             )
         ]
     ]
@@ -175,66 +110,37 @@ def showHistory(transformator):
     window = sg.Window("Identifikasi Kegagalan Transformator", layout)
     while True:
         event, values = window.read()
+
         if event == sg.WINDOW_CLOSED:
             break
 
-        if event == "Select Data Sample":
-            sampletr = values["sample"]
-            if sampletr == "Transformers 1":
-                window["cH2"].update("21")
-                window["rH2"].update("0")
-                window["cCH4"].update("39")
-                window["rCH4"].update("0")
-                window["cC2H2"].update("0")
-                window["rC2H2"].update("0")
-                window["cC2H4"].update("2")
-                window["rC2H4"].update("0.401")
-                window["cC2H6"].update("53")
-                window["rC2H6"].update("8.699")
+        if event == "transformator":
+            namatransformator = values["transformator"]
+            for item in transformator:
+                if namatransformator == item[0]:
+                    idtransformator = item[1]
+                    break
+            response = var.getResult(idtransformator).json()
+            table_data = [
+                [
+                    row["transformator"],
+                    row["date"],
+                    row["method"],
+                    row["H2"],
+                    row["CH4"],
+                    row["C2H2"],
+                    row["C2H4"],
+                    row["C2H6"],
+                    row["fault"],
+                    row["description"],
+                    row["penguji"],
+                ]
+                for row in response
+            ]
+            window["data"].update(values=table_data)
 
-            if sampletr == "Transformers 2":  # BALONGBENDO 2, STATUS 2
-                window["cH2"].update("85")
-                window["rH2"].update("18.639")
-                window["cCH4"].update("43")
-                window["rCH4"].update("6.982")
-                window["cC2H2"].update("0")
-                window["rC2H2"].update("0")
-                window["cC2H4"].update("2")
-                window["rC2H4"].update("0.472")
-                window["cC2H6"].update("55")
-                window["rC2H6"].update("9.592")
-
-            if sampletr == "Transformers 3":  # BAMBE 2, STATUS 3
-                window["cH2"].update("33000")
-                window["rH2"].update("21781.330")
-                window["cCH4"].update("188000")
-                window["rCH4"].update("124662.671")
-                window["cC2H2"].update("0")
-                window["rC2H2"].update("0")
-                window["cC2H4"].update("221000")
-                window["rC2H4"].update("145903.047")
-                window["cC2H6"].update("132000")
-                window["rC2H6"].update("87587.747")
-
-        if event == "Clear Data":
-            window["cH2"].update("")
-            window["rH2"].update("")
-            window["cCH4"].update("")
-            window["rCH4"].update("")
-            window["cC2H2"].update("")
-            window["rC2H2"].update("")
-            window["cC2H4"].update("")
-            window["rC2H4"].update("")
-            window["cC2H6"].update("")
-            window["rC2H6"].update("")
-        
         if event == "btnPerhitungan":
             window.close()
-
-    #     #DPM
-    #     #DPM PERCENTAGE
-
-    # #     if event == 'DPM 1':
 
     window.close()
     return True

@@ -1,7 +1,8 @@
 import requests as rq
 
 # url = "http://152.69.160.154/api"
-url = "http://10.147.17.161:8003/api"
+# url = "http://10.147.17.161:8003/api"
+url = "http://localhost:8000/api"
 
 
 def getPenguji():
@@ -67,4 +68,12 @@ def saveResultDPM(idinputdpm, cx, cy, fault):
             "cy": cy,
             "fault": fault,
         },
+    )
+
+def getResult(idtransformator):
+    return rq.get(
+        url + "/results",
+        params={
+            "transformator_id" : idtransformator,
+        }
     )
