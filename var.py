@@ -1,8 +1,8 @@
 import requests as rq
 
-# url = "http://152.69.160.154/api"
+url = "http://152.69.160.154/api"
 # url = "http://10.147.17.161:8003/api"
-url = "http://localhost:8000/api"
+# url = "http://localhost:8000/api"
 
 
 def getPenguji():
