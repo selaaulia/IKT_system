@@ -20,14 +20,14 @@ def showHistory(transformator):
     LayoutButton = [
         [sg.Text(" ")],
         [
-            sg.Button("Pilih Data", size=(17, 1), font=font1),
+            sg.Text("Nama Transformator", size=(17, 1), font=font1),
             sg.Combo(
                 [name[0] for name in transformator],
                 size=(15, 1),
                 key="transformator",
                 enable_events=True,
             ),
-            sg.Button("Hapus Data", size=(12, 1), font=font1),
+            sg.Button("Pilih", size=(12, 1), font=font1),
             sg.Text(" "),
             sg.Text(" "),
             sg.Text(" "),
@@ -43,17 +43,8 @@ def showHistory(transformator):
         # Penamaan Halaman
         [sg.Text(" ")],
         [
-            sg.Text("    "),
-            sg.Text("    "),
-            sg.Text("    "),
-            sg.Text("    "),
-            sg.Text("    "),
-            sg.Text("    "),
-            sg.Text("    "),
-            sg.Text("    "),
-            sg.Text("    "),
-            sg.Text("    "),
-            sg.Text("Halaman History", size=(20, 1), justification="c", font=font3),
+            sg.Text("      "),
+            sg.Text("Halaman History", size=(70, 1), justification="c", font=font3),
         ],
     ]
 
@@ -94,7 +85,7 @@ def showHistory(transformator):
             sg.Text("  "),
             sg.Text(
                 "Identifikasi Kegagalan Transformator Dengan DTM DPM",
-                size=(45, 1),
+                size=(70, 1),
                 justification="c",
                 font=font3,
             ),
