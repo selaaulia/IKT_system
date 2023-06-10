@@ -27,16 +27,14 @@ def showHistory(transformator):
                 key="transformator",
                 enable_events=True,
             ),
-            sg.Button("Pilih", size=(12, 1), font=font1),
-            sg.Text(" "),
-            sg.Text(" "),
-            sg.Text(" "),
-            sg.Text(" "),
-            sg.Text(" "),
-            sg.Text(" "),
-            sg.Text(" "),
-            sg.Text(" "),
-            sg.Text(" "),
+            # sg.Button("Pilih", size=(12, 1), font=font1),
+            sg.Text("                       "),
+            sg.Text("                       "),
+            sg.Text("                       "),
+            sg.Text("                       "),
+            sg.Text("                       "),
+            sg.Text("                       "),
+            sg.Text("                       "),
             # Button Halaman
             sg.Button("Perhitungan", size=(10, 1), font=font1, key="btnPerhitungan"),
         ],
@@ -44,7 +42,7 @@ def showHistory(transformator):
         [sg.Text(" ")],
         [
             sg.Text("      "),
-            sg.Text("Halaman History", size=(60, 1), justification="c", font=font3),
+            sg.Text("Halaman History", size=(80, 1), justification="c", font=font3),
         ],
     ]
 
@@ -66,10 +64,11 @@ def showHistory(transformator):
                     "Deskripsi",
                     "Penguji",
                 ],
-                num_rows=5,
-                col_widths=[15, 5, 20],
+                num_rows=15,
+                col_widths=[10, 10, 10, 10, 10, 10, 10, 10, 10, 30, 10],
                 justification="c",
                 key="data",
+                expand_x=True, expand_y=True
             )
         ]
     ]
@@ -79,13 +78,9 @@ def showHistory(transformator):
         # [sg.Text('', size=(25,1), justification='c', font=font3),
         [sg.Text(" ")],
         [
-            sg.Text("  "),
-            sg.Text("  "),
-            sg.Text("  "),
-            sg.Text("  "),
             sg.Text(
                 "Identifikasi Kegagalan Transformator Dengan DTM DPM",
-                size=(60, 1),
+                size=(80, 1),
                 justification="c",
                 font=font3,
             ),
@@ -135,3 +130,4 @@ def showHistory(transformator):
 
     window.close()
     return True
+
