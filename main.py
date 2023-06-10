@@ -364,7 +364,7 @@ def showHome():
         [
             sg.Text("                                              "),
             sg.Text("                                              "),
-            sg.Text(" "),
+            sg.Text("             "),
             sg.Button("History", size=(10, 1), font=font1),
         ],
     ]
