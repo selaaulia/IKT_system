@@ -536,11 +536,11 @@ def showHome():
                         sg.Popup(response.text.replace('"', ""))
 
             elif event == "AnalisisDPM":
-                h2 = float(values["dpm-H2"])
-                ch4 = float(values["dpm-CH4"])
-                c2h2 = float(values["dpm-C2H2"])
-                c2h4 = float(values["dpm-C2H4"])
-                c2h6 = float(values["dpm-C2H6"])
+                h2 = values["dpm-H2"]
+                ch4 = values["dpm-CH4"]
+                c2h2 = values["dpm-C2H2"]
+                c2h4 = values["dpm-C2H4"]
+                c2h6 = values["dpm-C2H6"]
 
                 if not h2.isdigit() or not ch4.isdigit() or not c2h2.isdigit() or not c2h4.isdigit() or not c2h6.isdigit():
                     sg.Popup('Input yang anda masukkan salah!')
