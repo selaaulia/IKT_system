@@ -542,97 +542,100 @@ def showHome():
                 c2h4 = float(values["dpm-C2H4"])
                 c2h6 = float(values["dpm-C2H6"])
 
-                # Menghitung titik Cx dan Cy yang terdiri dari beberapa tahap
-                # Menghitung presentase relatif gas
-                prH2 = h2 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
-                prCH4 = ch4 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
-                prC2H2 = c2h2 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
-                prC2H4 = c2h4 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
-                prC2H6 = c2h6 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
-                # Menghitung titik x, y
-                xH2 = prH2 / 100 * 0
-                yH2 = prH2 / 100 * 100
-                xCH4 = prCH4 / 100 * -58.8
-                yCH4 = prCH4 / 100 * -80.9
-                xC2H2 = prC2H2 / 100 * 95.1
-                yC2H2 = prC2H2 / 100 * 30.9
-                xC2H4 = prC2H4 / 100 * 58.8
-                yC2H4 = prC2H4 / 100 * -80.9
-                xC2H6 = prC2H6 / 100 * -95.1
-                yC2H6 = prC2H6 / 100 * 30.9
-                # Menghitung permukaan poligon
-                A = (
-                    1
-                    / 2
-                    * (
-                        (xH2 * yC2H6 - xC2H6 * yH2)
-                        + (xC2H6 * yCH4 - xCH4 * yC2H6)
-                        + (xCH4 * yC2H4 - xC2H4 * yCH4)
-                        + (xC2H4 * yC2H2 - xC2H2 * yC2H4)
+                if not h2.isdigit() or not ch4.isdigit() or not c2h2.isdigit() or not c2h4.isdigit() or not c2h6.isdigit():
+                    sg.Popup('Input yang anda masukkan salah!')
+                else:
+                    # Menghitung titik Cx dan Cy yang terdiri dari beberapa tahap
+                    # Menghitung presentase relatif gas
+                    prH2 = h2 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
+                    prCH4 = ch4 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
+                    prC2H2 = c2h2 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
+                    prC2H4 = c2h4 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
+                    prC2H6 = c2h6 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
+                    # Menghitung titik x, y
+                    xH2 = prH2 / 100 * 0
+                    yH2 = prH2 / 100 * 100
+                    xCH4 = prCH4 / 100 * -58.8
+                    yCH4 = prCH4 / 100 * -80.9
+                    xC2H2 = prC2H2 / 100 * 95.1
+                    yC2H2 = prC2H2 / 100 * 30.9
+                    xC2H4 = prC2H4 / 100 * 58.8
+                    yC2H4 = prC2H4 / 100 * -80.9
+                    xC2H6 = prC2H6 / 100 * -95.1
+                    yC2H6 = prC2H6 / 100 * 30.9
+                    # Menghitung permukaan poligon
+                    A = (
+                        1
+                        / 2
+                        * (
+                            (xH2 * yC2H6 - xC2H6 * yH2)
+                            + (xC2H6 * yCH4 - xCH4 * yC2H6)
+                            + (xCH4 * yC2H4 - xC2H4 * yCH4)
+                            + (xC2H4 * yC2H2 - xC2H2 * yC2H4)
+                        )
                     )
-                )
-                # Menghitung Cx dan Cy
-                cx = (
-                    1
-                    / (6 * A)
-                    * (
-                        (xH2 + xC2H6) * (xH2 * yC2H6 - xC2H6 * yH2)
-                        + (xC2H6 + xCH4) * (xC2H6 * yCH4 - xCH4 * yC2H6)
-                        + (xCH4 + xC2H4) * (xCH4 * yC2H4 - xC2H4 * yCH4)
-                        + (xC2H4 + xC2H2) * (xC2H4 * yC2H2 - xC2H2 * yC2H4)
+                    # Menghitung Cx dan Cy
+                    cx = (
+                        1
+                        / (6 * A)
+                        * (
+                            (xH2 + xC2H6) * (xH2 * yC2H6 - xC2H6 * yH2)
+                            + (xC2H6 + xCH4) * (xC2H6 * yCH4 - xCH4 * yC2H6)
+                            + (xCH4 + xC2H4) * (xCH4 * yC2H4 - xC2H4 * yCH4)
+                            + (xC2H4 + xC2H2) * (xC2H4 * yC2H2 - xC2H2 * yC2H4)
+                        )
                     )
-                )
-                cy = (
-                    1
-                    / (6 * A)
-                    * (
-                        (yH2 + yC2H6) * (xH2 * yC2H6 - xC2H6 * yH2)
-                        + (yC2H6 + yCH4) * (xC2H6 * yCH4 - xCH4 * yC2H6)
-                        + (yCH4 + yC2H4) * (xCH4 * yC2H4 - xC2H4 * yCH4)
-                        + (yC2H4 + yC2H2) * (xC2H4 * yC2H2 - xC2H2 * yC2H4)
-                    )
-                )
-
-                Hasil_cx = "Hasil Cx =" + str(cx)
-                Hasil_cy = "Hasil Cy =" + str(cy)
-
-                # Prediksi
-                dpm_model = joblib.load(os.path.join(dirname, "models/dpm.pckl"))
-                dpm_prediction = dpm_model.predict(np.array([[cx, cy]]))
-                # print(dpm_prediction)
-
-                # simpan data ke database
-                response = var.saveInputDPM(
-                    idpenguji, idtransformator, h2, ch4, c2h2, c2h4, c2h6
-                )
-                jsonInputDPM = response.json()
-                if response.status_code == 200:
-                    # Menyimpan hasil analisis
-                    responseResultDPM = var.saveResultDPM(
-                        jsonInputDPM["id"], cx, cy, dpm_prediction[0]
-                    )
-                    jsonResultDPM = responseResultDPM.json()
-
-                    # Menampilkan hasil analisis
-                    window["rnama_penguji"].update(namapenguji)
-                    window["rnama_transformator"].update(namatransformator)
-                    window["rmetode"].update(metode)
-                    window["result_fault"].update(dpm_prediction[0])
-                    window["result_description"].update(
-                        jsonResultDPM["description_dpm"]
-                        + "\n"
-                        + Hasil_cx
-                        + "\n"
-                        + Hasil_cy
+                    cy = (
+                        1
+                        / (6 * A)
+                        * (
+                            (yH2 + yC2H6) * (xH2 * yC2H6 - xC2H6 * yH2)
+                            + (yC2H6 + yCH4) * (xC2H6 * yCH4 - xCH4 * yC2H6)
+                            + (yCH4 + yC2H4) * (xCH4 * yC2H4 - xC2H4 * yCH4)
+                            + (yC2H4 + yC2H2) * (xC2H4 * yC2H2 - xC2H2 * yC2H4)
+                        )
                     )
 
-                    if responseResultDPM.status_code == 200:
-                        sg.Popup(jsonResultDPM["message"])
+                    Hasil_cx = "Hasil Cx =" + str(cx)
+                    Hasil_cy = "Hasil Cy =" + str(cy)
+
+                    # Prediksi
+                    dpm_model = joblib.load(os.path.join(dirname, "models/dpm.pckl"))
+                    dpm_prediction = dpm_model.predict(np.array([[cx, cy]]))
+                    # print(dpm_prediction)
+
+                    # simpan data ke database
+                    response = var.saveInputDPM(
+                        idpenguji, idtransformator, h2, ch4, c2h2, c2h4, c2h6
+                    )
+                    jsonInputDPM = response.json()
+                    if response.status_code == 200:
+                        # Menyimpan hasil analisis
+                        responseResultDPM = var.saveResultDPM(
+                            jsonInputDPM["id"], cx, cy, dpm_prediction[0]
+                        )
+                        jsonResultDPM = responseResultDPM.json()
+
+                        # Menampilkan hasil analisis
+                        window["rnama_penguji"].update(namapenguji)
+                        window["rnama_transformator"].update(namatransformator)
+                        window["rmetode"].update(metode)
+                        window["result_fault"].update(dpm_prediction[0])
+                        window["result_description"].update(
+                            jsonResultDPM["description_dpm"]
+                            + "\n"
+                            + Hasil_cx
+                            + "\n"
+                            + Hasil_cy
+                        )
+
+                        if responseResultDPM.status_code == 200:
+                            sg.Popup(jsonResultDPM["message"])
+                        else:
+                            sg.Popup(response.text.replace('"', ""))
+
                     else:
                         sg.Popup(response.text.replace('"', ""))
-
-                else:
-                    sg.Popup(response.text.replace('"', ""))
 
         if event == "History":
             window.hide()
