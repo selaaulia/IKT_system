@@ -503,34 +503,37 @@ def showHome():
                 c2h2 = values["dtm-C2H2"]
                 c2h4 = values["dtm-C2H4"]
 
-                # prediksi
-                dtm_model = joblib.load(os.path.join(dirname, "models/dtm.pckl"))
-                dtm_prediction = dtm_model.predict(np.array([[ch4, c2h2, c2h4]]))
+                if not ch4.isdigit() or not c2h2.isdigit() or not c2h4.isdigit():
+                    sg.Popup('Input yang anda masukkan salah!')
+                else:
+                    # prediksi
+                    dtm_model = joblib.load(os.path.join(dirname, "models/dtm.pckl"))
+                    dtm_prediction = dtm_model.predict(np.array([[ch4, c2h2, c2h4]]))
 
-                # simpan data ke database
-                response = var.saveInputDTM(idpenguji, idtransformator, ch4, c2h2, c2h4)
-                jsonInput = response.json()
-                if response.status_code == 200:
-                    # Menyimpan hasil analisis
-                    responseResult = var.saveResultDTM(
-                        jsonInput["id"], dtm_prediction[0]
-                    )
-                    jsonResult = responseResult.json()
+                    # simpan data ke database
+                    response = var.saveInputDTM(idpenguji, idtransformator, ch4, c2h2, c2h4)
+                    jsonInput = response.json()
+                    if response.status_code == 200:
+                        # Menyimpan hasil analisis
+                        responseResult = var.saveResultDTM(
+                            jsonInput["id"], dtm_prediction[0]
+                        )
+                        jsonResult = responseResult.json()
 
-                    # Menampilkan hasil analsis
-                    window["rnama_penguji"].update(namapenguji)
-                    window["rnama_transformator"].update(namatransformator)
-                    window["rmetode"].update(metode)
-                    window["result_fault"].update(dtm_prediction[0])
-                    window["result_description"].update(jsonResult["description"])
+                        # Menampilkan hasil analsis
+                        window["rnama_penguji"].update(namapenguji)
+                        window["rnama_transformator"].update(namatransformator)
+                        window["rmetode"].update(metode)
+                        window["result_fault"].update(dtm_prediction[0])
+                        window["result_description"].update(jsonResult["description"])
 
-                    if responseResult.status_code == 200:
-                        sg.Popup(jsonResult["message"])
+                        if responseResult.status_code == 200:
+                            sg.Popup(jsonResult["message"])
+                        else:
+                            sg.Popup(response.text.replace('"', ""))
+
                     else:
                         sg.Popup(response.text.replace('"', ""))
-
-                else:
-                    sg.Popup(response.text.replace('"', ""))
 
             elif event == "AnalisisDPM":
                 h2 = float(values["dpm-H2"])
