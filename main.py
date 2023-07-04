@@ -13,6 +13,21 @@ import os
 dirname = os.path.dirname(__file__)
 
 
+def is_number(value):
+    # Periksa apakah value adalah bilangan bulat
+    if value.isnumeric():
+        return True
+
+    # Hapus tanda negatif (jika ada)
+    value_without_negative = value.replace("-", "")
+
+    # Hapus titik desimal (jika ada)
+    value_without_decimal = value_without_negative.replace(".", "")
+
+    # Periksa apakah sisanya adalah digit
+    return value_without_decimal.isdigit()
+
+
 def showHome():
     # create theme
     sg.theme("DarkTeal11")
@@ -83,7 +98,7 @@ def showHome():
         [sg.Text("     ")],
         [sg.Text("     ")],
         [sg.Text("     ")],
-        #Keterangan
+        # Keterangan
         [
             sg.Text(
                 "Keterangan: \nButton +Penguji / +trafo digunakan untuk menambah nama penguji dan nama transformator yang belum terdapat pada list dropdown",
@@ -504,14 +519,16 @@ def showHome():
                 c2h4 = values["dtm-C2H4"]
 
                 if not ch4.isdigit() or not c2h2.isdigit() or not c2h4.isdigit():
-                    sg.Popup('Input yang anda masukkan salah!')
+                    sg.Popup("Input yang anda masukkan salah!")
                 else:
                     # prediksi
                     dtm_model = joblib.load(os.path.join(dirname, "models/dtm.pckl"))
                     dtm_prediction = dtm_model.predict(np.array([[ch4, c2h2, c2h4]]))
 
                     # simpan data ke database
-                    response = var.saveInputDTM(idpenguji, idtransformator, ch4, c2h2, c2h4)
+                    response = var.saveInputDTM(
+                        idpenguji, idtransformator, ch4, c2h2, c2h4
+                    )
                     jsonInput = response.json()
                     if response.status_code == 200:
                         # Menyimpan hasil analisis
@@ -542,9 +559,14 @@ def showHome():
                 c2h4 = values["dpm-C2H4"]
                 c2h6 = values["dpm-C2H6"]
 
-                if not h2.isdigit() or not ch4.isdigit() or not c2h2.isdigit() or not c2h4.isdigit() or not c2h6.isdigit():
+                if not is_number(h2) or not is_number(ch4) or not is_number(c2h2) or not is_number(c2h4) or not is_number(c2h6):
                     sg.Popup('Input yang anda masukkan salah!')
                 else:
+                    h2 = float(h2)
+                    ch4 = float(ch4)
+                    c2h2 = float(c2h2)
+                    c2h4 = float(c2h4)
+                    c2h6 = float(c2h6)
                     # Menghitung titik Cx dan Cy yang terdiri dari beberapa tahap
                     # Menghitung presentase relatif gas
                     prH2 = h2 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
@@ -646,4 +668,3 @@ def showHome():
 
 
 showHome()
-
