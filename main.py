@@ -356,8 +356,8 @@ def showHome():
         [sg.Text("  ")],
         [
             sg.Text(
-                "Sela Aulia Siswanto \nTeknik Informatika \nPoliteknik Negeri Malang \nEkojono, ST,. M.Kom. \n© 2023",
-                size=(30, 5),
+                "Sela Aulia Siswanto \nTeknik Informatika \nPoliteknik Negeri Malang \nEkojono, ST,. M.Kom. & Meyti Eka Apriyani ST., MT\n© 2023",
+                size=(40, 5),
                 background_color="#4a4740",
                 text_color="white",
                 justification="l",
@@ -518,9 +518,12 @@ def showHome():
                 c2h2 = values["dtm-C2H2"]
                 c2h4 = values["dtm-C2H4"]
 
-                if not ch4.isdigit() or not c2h2.isdigit() or not c2h4.isdigit():
+                if not is_number(ch4) or not is_number(c2h2) or not is_number(c2h4):
                     sg.Popup("Input yang anda masukkan salah!")
                 else:
+                    ch4 = float(ch4)
+                    c2h2 = float(c2h2)
+                    c2h4 = float(c2h4)
                     # prediksi
                     dtm_model = joblib.load(os.path.join(dirname, "models/dtm.pckl"))
                     dtm_prediction = dtm_model.predict(np.array([[ch4, c2h2, c2h4]]))
