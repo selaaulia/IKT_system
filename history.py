@@ -2,7 +2,9 @@
 
 import PySimpleGUI as sg
 import var
-
+import webbrowser
+import tkinter as tk
+from tkinter import filedialog
 
 def showHistory(transformator):
     # create theme
@@ -23,7 +25,7 @@ def showHistory(transformator):
             sg.Text("Nama Transformator", size=(17, 1), font=font1),
             sg.Combo(
                 [name[0] for name in transformator],
-                size=(15, 1),
+                size=(25, 1),
                 key="transformator",
                 enable_events=True,
             ),
@@ -34,7 +36,7 @@ def showHistory(transformator):
             sg.Text("                       "),
             sg.Text("                       "),
             sg.Text("                       "),
-            sg.Text("                       "),
+            sg.Button("Export Excel", size=(10,1), font=font2, key="Export"),
             # Button Halaman
             sg.Button("Perhitungan", size=(10, 1), font=font1, key="btnPerhitungan"),
         ],
@@ -124,7 +126,14 @@ def showHistory(transformator):
                 for row in response
             ]
             window["data"].update(values=table_data)
-
+        if event == "Export":
+            response = var.getExportResult(idtransformator)
+            root = tk.Tk()
+            root.withdraw()
+            filepath = filedialog.asksaveasfilename(defaultextension=".xlsx")
+            with open(filepath, 'wb') as file:
+                file.write(response.content)
+            # webbrowser.open(var.weburl + "/export?transformator_id=" + str(idtransformator))
         if event == "btnPerhitungan":
             window.close()
 

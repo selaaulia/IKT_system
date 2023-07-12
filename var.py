@@ -1,6 +1,7 @@
 import requests as rq
 
 url = "http://152.69.160.154/api"
+weburl = "http://152.69.160.154"
 # url = "http://10.147.17.161:8003/api"
 # url = "http://localhost:8000/api"
 
@@ -73,6 +74,14 @@ def saveResultDPM(idinputdpm, cx, cy, fault):
 def getResult(idtransformator):
     return rq.get(
         url + "/results",
+        params={
+            "transformator_id" : idtransformator,
+        }
+    )
+
+def getExportResult(idtransformator):
+    return rq.get(
+        weburl + "/export",
         params={
             "transformator_id" : idtransformator,
         }
