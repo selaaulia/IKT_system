@@ -4,6 +4,7 @@ import PySimpleGUI as sg
 import var
 import history
 import numpy as np
+import pandas as pd
 import joblib
 import os
 
@@ -28,6 +29,66 @@ def is_number(value):
     return value_without_decimal.isdigit()
 
 
+def hitung_cx_cy(h2, ch4, c2h2, c2h4, c2h6):
+    h2 = float(h2)
+    ch4 = float(ch4)
+    c2h2 = float(c2h2)
+    c2h4 = float(c2h4)
+    c2h6 = float(c2h6)
+    # Menghitung titik Cx dan Cy yang terdiri dari beberapa tahap
+    # Menghitung presentase relatif gas
+    prH2 = h2 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
+    prCH4 = ch4 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
+    prC2H2 = c2h2 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
+    prC2H4 = c2h4 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
+    prC2H6 = c2h6 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
+    # Menghitung titik x, y
+    xH2 = prH2 / 100 * 0
+    yH2 = prH2 / 100 * 100
+    xCH4 = prCH4 / 100 * -58.8
+    yCH4 = prCH4 / 100 * -80.9
+    xC2H2 = prC2H2 / 100 * 95.1
+    yC2H2 = prC2H2 / 100 * 30.9
+    xC2H4 = prC2H4 / 100 * 58.8
+    yC2H4 = prC2H4 / 100 * -80.9
+    xC2H6 = prC2H6 / 100 * -95.1
+    yC2H6 = prC2H6 / 100 * 30.9
+    # Menghitung permukaan poligon
+    A = (
+        1
+        / 2
+        * (
+            (xH2 * yC2H6 - xC2H6 * yH2)
+            + (xC2H6 * yCH4 - xCH4 * yC2H6)
+            + (xCH4 * yC2H4 - xC2H4 * yCH4)
+            + (xC2H4 * yC2H2 - xC2H2 * yC2H4)
+        )
+    )
+    # Menghitung Cx dan Cy
+    cx = (
+        1
+        / (6 * A)
+        * (
+            (xH2 + xC2H6) * (xH2 * yC2H6 - xC2H6 * yH2)
+            + (xC2H6 + xCH4) * (xC2H6 * yCH4 - xCH4 * yC2H6)
+            + (xCH4 + xC2H4) * (xCH4 * yC2H4 - xC2H4 * yCH4)
+            + (xC2H4 + xC2H2) * (xC2H4 * yC2H2 - xC2H2 * yC2H4)
+        )
+    )
+    cy = (
+        1
+        / (6 * A)
+        * (
+            (yH2 + yC2H6) * (xH2 * yC2H6 - xC2H6 * yH2)
+            + (yC2H6 + yCH4) * (xC2H6 * yCH4 - xCH4 * yC2H6)
+            + (yCH4 + yC2H4) * (xCH4 * yC2H4 - xC2H4 * yCH4)
+            + (yC2H4 + yC2H2) * (xC2H4 * yC2H2 - xC2H2 * yC2H4)
+        )
+    )
+
+    return cx, cy
+
+
 def showHome():
     # create theme
     sg.theme("DarkTeal11")
@@ -43,6 +104,9 @@ def showHome():
     # mengambil data penguji
     penguji = var.getPenguji()
     transformator = var.getTransformator()
+    # Mengambil model prediksi
+    dtm_model = joblib.load(os.path.join(dirname, "models/dtm.pckl"))
+    dpm_model = joblib.load(os.path.join(dirname, "models/dpm.pckl"))
 
     # Layout 1 untuk identitas
     layout1 = [
@@ -71,6 +135,7 @@ def showHome():
             ),
             sg.Text("  "),
             sg.Button("+ Penguji"),
+            sg.Text(""),
         ],
         [sg.Text("     ")],
         # Input nama transformator
@@ -92,12 +157,6 @@ def showHome():
             sg.Combo(["DTM", "DPM"], key="Metode", size=(20, 1), enable_events=True),
         ],
         [sg.Text("     ")],
-        [sg.Text("     ")],
-        [sg.Text("     ")],
-        [sg.Text("     ")],
-        [sg.Text("     ")],
-        [sg.Text("     ")],
-        [sg.Text("     ")],
         # Keterangan
         [
             sg.Text(
@@ -109,6 +168,22 @@ def showHome():
                 font=font2,
             )
         ],
+    ]
+
+    layout_import = [
+        [sg.Text("Import Data Excel", font=font3, justification="c", size=(27, 1))],
+        [sg.Text("     ")],
+        [
+            sg.Text("Pilih file Excel", size=(12, 1), justification="c", font=font2),
+            sg.InputText(key="-FILE-", size=(22, 1)),
+            sg.FileBrowse(),
+        ],
+        [sg.Text("     ")],
+        [
+            sg.Text("                           "),
+            sg.Button("Import Data", key="Import"),
+        ],
+        [sg.Text("     ")],
     ]
 
     # layout left
@@ -384,10 +459,14 @@ def showHome():
         ],
     ]
 
+    layout1_main = [
+        [sg.Frame("", layout1, font=font1)],
+        [sg.Frame("", layout_import, key="layoutImport", visible=True)],
+    ]
+
     # main layout
     layout = [
-        # [sg.Text('', size=(25,1), justification='c', font=font3),
-        [sg.Text(" ")],
+        [sg.Text("", size=(25, 1), justification="c", font=font3)],
         [
             sg.Text("  "),
             sg.Text("  "),
@@ -402,7 +481,7 @@ def showHome():
         ],
         [sg.Text("  ")],
         [
-            sg.Frame("", layout1, font=font1),
+            sg.Column(layout1_main),
             sg.Frame("", layout2_DPM, font=font2, key="layout2DPM", visible=False),
             sg.Frame("", layout2_DTM, font=font2, key="layout2DTM", visible=False),
             sg.Frame("", layout3, font=font2, key="hasil"),
@@ -497,6 +576,61 @@ def showHome():
 
             popup.Close()
 
+        # Bagian Import
+        if event == "Import":
+            file_path = values["-FILE-"]
+            if file_path:
+                try:
+                    # Membaca data dari file Excel
+                    df = pd.read_excel(file_path)
+                    if df is not None:
+                        for row in df.values.tolist():
+                            namapenguji = row[0]
+                            namatransformator = row[1]
+                            for item in penguji:
+                                if namapenguji == item[0]:
+                                    idpenguji = item[1]
+                                    break
+                            for item in transformator:
+                                if namatransformator == item[0]:
+                                    idtransformator = item[1]
+                                    break
+                            if row[2] == "DTM":
+                                ch4 = row[4]
+                                c2h2 = row[5]
+                                c2h4 = row[6]
+                                response = var.saveInputDTM(
+                                    idpenguji, idtransformator, ch4, c2h2, c2h4
+                                )
+                                dtm_prediction = dtm_model.predict(
+                                    np.array([[ch4, c2h2, c2h4]])
+                                )
+                                jsonInput = response.json()
+                                var.saveResultDTM(jsonInput["id"], dtm_prediction[0])
+                            elif row[2] == "DPM":
+                                h2 = row[3]
+                                ch4 = row[4]
+                                c2h2 = row[5]
+                                c2h4 = row[6]
+                                c2h6 = row[7]
+                                cx, cy = hitung_cx_cy(h2, ch4, c2h2, c2h4, c2h6)
+                                response = var.saveInputDPM(
+                                    idpenguji,
+                                    idtransformator,
+                                    h2,
+                                    ch4,
+                                    c2h2,
+                                    c2h4,
+                                    c2h6,
+                                )
+                                dpm_prediction = dpm_model.predict(np.array([[cx, cy]]))
+                                jsonInput = response.json()
+                                var.saveResultDPM(
+                                    jsonInput["id"], cx, cy, dpm_prediction[0]
+                                )
+                except Exception as e:
+                    sg.popup_error(f"Terjadi kesalahan: {e}")
+
         # Kirim data input DTM dan DPM ke database untuk analisis
         if event == "AnalisisDTM" or event == "AnalisisDPM":
             # Mendapatkan Id nama penguji
@@ -525,7 +659,6 @@ def showHome():
                     c2h2 = float(c2h2)
                     c2h4 = float(c2h4)
                     # prediksi
-                    dtm_model = joblib.load(os.path.join(dirname, "models/dtm.pckl"))
                     dtm_prediction = dtm_model.predict(np.array([[ch4, c2h2, c2h4]]))
 
                     # simpan data ke database
@@ -562,70 +695,20 @@ def showHome():
                 c2h4 = values["dpm-C2H4"]
                 c2h6 = values["dpm-C2H6"]
 
-                if not is_number(h2) or not is_number(ch4) or not is_number(c2h2) or not is_number(c2h4) or not is_number(c2h6):
-                    sg.Popup('Input yang anda masukkan salah!')
+                if (
+                    not is_number(h2)
+                    or not is_number(ch4)
+                    or not is_number(c2h2)
+                    or not is_number(c2h4)
+                    or not is_number(c2h6)
+                ):
+                    sg.Popup("Input yang anda masukkan salah!")
                 else:
-                    h2 = float(h2)
-                    ch4 = float(ch4)
-                    c2h2 = float(c2h2)
-                    c2h4 = float(c2h4)
-                    c2h6 = float(c2h6)
-                    # Menghitung titik Cx dan Cy yang terdiri dari beberapa tahap
-                    # Menghitung presentase relatif gas
-                    prH2 = h2 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
-                    prCH4 = ch4 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
-                    prC2H2 = c2h2 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
-                    prC2H4 = c2h4 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
-                    prC2H6 = c2h6 / (h2 + ch4 + c2h2 + c2h4 + c2h6) * 100
-                    # Menghitung titik x, y
-                    xH2 = prH2 / 100 * 0
-                    yH2 = prH2 / 100 * 100
-                    xCH4 = prCH4 / 100 * -58.8
-                    yCH4 = prCH4 / 100 * -80.9
-                    xC2H2 = prC2H2 / 100 * 95.1
-                    yC2H2 = prC2H2 / 100 * 30.9
-                    xC2H4 = prC2H4 / 100 * 58.8
-                    yC2H4 = prC2H4 / 100 * -80.9
-                    xC2H6 = prC2H6 / 100 * -95.1
-                    yC2H6 = prC2H6 / 100 * 30.9
-                    # Menghitung permukaan poligon
-                    A = (
-                        1
-                        / 2
-                        * (
-                            (xH2 * yC2H6 - xC2H6 * yH2)
-                            + (xC2H6 * yCH4 - xCH4 * yC2H6)
-                            + (xCH4 * yC2H4 - xC2H4 * yCH4)
-                            + (xC2H4 * yC2H2 - xC2H2 * yC2H4)
-                        )
-                    )
-                    # Menghitung Cx dan Cy
-                    cx = (
-                        1
-                        / (6 * A)
-                        * (
-                            (xH2 + xC2H6) * (xH2 * yC2H6 - xC2H6 * yH2)
-                            + (xC2H6 + xCH4) * (xC2H6 * yCH4 - xCH4 * yC2H6)
-                            + (xCH4 + xC2H4) * (xCH4 * yC2H4 - xC2H4 * yCH4)
-                            + (xC2H4 + xC2H2) * (xC2H4 * yC2H2 - xC2H2 * yC2H4)
-                        )
-                    )
-                    cy = (
-                        1
-                        / (6 * A)
-                        * (
-                            (yH2 + yC2H6) * (xH2 * yC2H6 - xC2H6 * yH2)
-                            + (yC2H6 + yCH4) * (xC2H6 * yCH4 - xCH4 * yC2H6)
-                            + (yCH4 + yC2H4) * (xCH4 * yC2H4 - xC2H4 * yCH4)
-                            + (yC2H4 + yC2H2) * (xC2H4 * yC2H2 - xC2H2 * yC2H4)
-                        )
-                    )
-
+                    cx, cy = hitung_cx_cy(h2, ch4, c2h2, c2h4, c2h6)
                     Hasil_cx = "Hasil Cx =" + str(cx)
                     Hasil_cy = "Hasil Cy =" + str(cy)
 
                     # Prediksi
-                    dpm_model = joblib.load(os.path.join(dirname, "models/dpm.pckl"))
                     dpm_prediction = dpm_model.predict(np.array([[cx, cy]]))
                     # print(dpm_prediction)
 
