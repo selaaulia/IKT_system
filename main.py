@@ -628,6 +628,7 @@ def showHome():
                                 var.saveResultDPM(
                                     jsonInput["id"], cx, cy, dpm_prediction[0]
                                 )
+                        sg.popup('Data berhasil diimport, Silahkan cek di history :\n\n', df)
                 except Exception as e:
                     sg.popup_error(f"Terjadi kesalahan: {e}")
 
